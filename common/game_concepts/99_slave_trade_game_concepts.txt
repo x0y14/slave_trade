@@ -1,0 +1,3 @@
+﻿slave = {
+	texture = "gfx/interface/icons/event_types/type_prison.dds"
+}

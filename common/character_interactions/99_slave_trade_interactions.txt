@@ -1,0 +1,216 @@
+﻿#interaction_category_diplomacy
+
+sell_slave_interaction = {
+	icon = prison
+	category = interaction_category_diplomacy
+	common_interaction = yes
+
+	populate_recipient_list = {
+		scope:actor = {
+			every_prisoner = {
+				limit = { NOT = { is_in_prison_type = dungeon } }
+				# ムスリムはムスリムを奴隷とすることが禁じられている
+				# TODO: scope:actorがイスラム教だったらムスリムは除外する
+				# あるいは販売できるが犯罪になる(投獄理由)
+				add_to_list = characters
+			}
+		}
+	}
+
+	desc = sell_slave_interaction_desc
+
+	prompt = ARRANGE_SLAVE_TRADE_SELECT_SLAVE_TO_TRADE
+
+	notification_text = ARRANGE_SLAVE_TRADE_PROPOSAL
+
+	is_shown = {
+		NOT = { scope:recipient = scope:actor }
+	}
+
+	is_valid_showing_failures_only = {
+		scope:actor = {
+			any_prisoner = {
+				count > 0
+			}
+		}
+	}
+
+	can_be_picked = {
+		NOT = { is_landed = yes }
+		# any_heir_title = {
+		# 	exists = holder
+		# 	holder = scope:recipient
+		# 	place_in_line_of_succession = {
+		# 		target = scope:actor
+		# 		value > 2
+		# 	}
+		# }
+	}
+
+	cost = {}
+
+	on_send = {
+		# 私を売りに出した
+	}
+
+	on_accept = {
+		# add_courtier
+		# SLAVE_PRICE_SUM_SMALL = 10
+		# SLAVE_PRICE_SUM_MEDIUM = 50
+		# SLAVE_PRICE_SUM_LARGE = 100
+		# SLAVE_PRICE_SUM_LOYALTY = 150
+		if = {
+			limit = { scope:pt_sum_small = yes }
+			scope:recipient = {
+				pay_short_term_gold = {
+					target = scope:actor
+					gold = SLAVE_PRICE_SUM_SMALL
+				}
+			}
+		}
+		else_if = {
+			limit = { scope:pt_sum_medium = yes }
+			scope:recipient = {
+				pay_short_term_gold = {
+					target = scope:actor
+					gold = SLAVE_PRICE_SUM_MEDIUM
+				}
+			}
+		}
+		else_if = {
+			limit = { scope:pt_sum_large = yes }
+			scope:recipient = {
+				pay_short_term_gold = {
+					target = scope:actor
+					gold = SLAVE_PRICE_SUM_LARGE
+				}
+			}
+		}
+		else_if = {
+			limit = { scope:loyalty = yes }
+			scope:recipient = {
+				pay_short_term_gold = {
+					target = scope:actor
+					gold = SLAVE_PRICE_SUM_LOYALTY
+				}
+			}
+			scope:recipient = {
+				if = {
+					limit = {
+						can_add_hook = {
+							target = scope:secondary_recipient
+							type = loyalty_hook
+						}
+					}
+					add_hook = {
+						type = loyalty_hook
+						target = scope:secondary_recipient
+					}
+				}
+			}
+		}
+
+		# 才能の評価
+		# release_from_prison_interaction
+		if = {
+			limit = {
+				scope:recipient.culture = { has_cultural_parameter = can_recruit_prisoners_easily }
+			}
+			scope:secondary_recipient = {
+				add_opinion = {
+					modifier = loyal_servant
+					target = scope:recipient
+				}
+			}
+			scope:recipient = {
+				if = {
+					limit = {
+						can_add_hook = {
+							target = scope:secondary_recipient
+							type = loyalty_hook
+						}
+					}
+					add_hook = {
+						type = loyalty_hook
+						target = scope:secondary_recipient
+					}
+				}
+			}
+		}
+
+		scope:secondary_recipient = {
+			release_from_prison = yes
+		}
+		scope:recipient = {
+			add_courtier = scope:secondary_recipient
+		}
+	}
+
+	on_decline = {
+
+	}
+
+
+	send_options_exclusive = yes
+	# 安い値段 在庫処分的な
+	send_option = {
+		is_shown = { always = yes }
+		flag = pt_sum_small
+		localization = "PT_SUM_SMALL"
+	}
+	# 普通の値段 子供とか
+	send_option = {
+		# purchase_truce_interaction
+		# is_shown = {
+		# 	# We use the most expensive of scope:actor or scope:recipient's income, so we check both.
+		# 	scope:actor = {
+		# 		can_make_expensive_purchase_trigger = { PRICE = scope:actor.purchase_truce_interaction_medium_sum }
+		# 		can_make_expensive_purchase_trigger = { PRICE = scope:recipient.purchase_truce_interaction_medium_sum }
+		# 	}
+		# }
+		is_shown = { always = yes }
+		flag = pt_sum_medium
+		starts_enabled = { always = yes }
+		localization = "PT_SUM_MEDIUM"
+	}
+	# 高い値段 良い遺伝子を持っている人
+	send_option = {
+		# is_shown = {
+		# 	# We use the most expensive of scope:actor or scope:recipient's income, so we check both.
+		# 	scope:actor = {
+		# 		can_make_expensive_purchase_trigger = { PRICE = scope:actor.purchase_truce_interaction_major_sum }
+		# 		can_make_expensive_purchase_trigger = { PRICE = scope:recipient.purchase_truce_interaction_major_sum }
+		# 	}
+		# }
+		is_shown = { always = yes }
+		flag = pt_sum_large
+		localization = "PT_SUM_LARGE"
+	}
+	# 忠誠を誓わせる 兵士向け
+	send_option = {
+		# is_shown = {
+		# 	exists = scope:secondary_recipient
+		# }
+		is_valid = {
+			exists = scope:secondary_recipient
+			NOT = {
+				scope:recipient.culture = { has_cultural_parameter = can_recruit_prisoners_easily }
+			}
+			scope:recipient = {
+				can_add_hook = {
+					target = scope:secondary_recipient
+					type = loyalty_hook
+				}
+			}
+		}
+		flag = loyalty
+		localization = MAKE_LOYALTY
+	}
+	should_use_extra_icon = {}
+	extra_icon = "gfx/interface/icons/character_interactions/hook_icon.dds"
+
+
+	ai_accept = {
+		base = 100
+	}
+}

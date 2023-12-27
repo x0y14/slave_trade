@@ -1,0 +1,14 @@
+﻿l_english:
+  ### game concept
+  game_concept_slave: "Slave"
+  game_concept_slave_desc: "$game_concept_slave$ DESC"
+
+
+  ### interaction
+  sell_slave_interaction: "Arrange Slave Trade"
+  sell_slave_interaction_desc: "$sell_slave_interaction$ DECS"
+  ARRANGE_SLAVE_TRADE_SELECT_SLAVE_TO_TRADE: "Select [slave|e] to trade"
+  ARRANGE_SLAVE_TRADE_PROPOSAL: "Would you like to buy [secondary_actor.GetCulture.GetCollectiveNoun] slave [actor.Custom2('RelationToMeShort', SCOPE.sC('secondary_actor'))], [secondary_actor.GetFirstName] ?"
+  # SCHEME_HOOK:1 "Use a [hook_i][hook|e]"
+  MAKE_LOYALTY:1 "make [slave|e] [hook_i] loyalty"
+  recipient_secondary_sell_slave_interaction: "[slave|e]"

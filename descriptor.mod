@@ -1,0 +1,6 @@
+version="0.0.1"
+tags={
+	"Gameplay"
+}
+name="slave trade"
+supported_version="1.11.3"
