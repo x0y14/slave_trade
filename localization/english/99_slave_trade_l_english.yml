@@ -1,9 +1,4 @@
 ﻿l_english:
-  ### game concept
-  game_concept_slave: "Slave"
-  game_concept_slave_desc: "$game_concept_slave$ DESC"
-
-
   ### interaction
   sell_slave_interaction: "Arrange Slave Trade"
   sell_slave_interaction_desc: "$sell_slave_interaction$ DECS"
