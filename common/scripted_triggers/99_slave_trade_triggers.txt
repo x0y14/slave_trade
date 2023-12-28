@@ -1,0 +1,3 @@
+﻿is_mamluk_system_core_installed = {
+	has_global_variable = mamluk_system_core_installed
+}

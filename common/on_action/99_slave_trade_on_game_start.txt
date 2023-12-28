@@ -1,5 +1,8 @@
 ﻿on_game_start = {
 	events = {
+		# slave trade installed
 		slave_trade.0001
+		# berber meets longboarts
+		slave_trade.0002
 	}
 }

@@ -144,6 +144,16 @@ sell_slave_interaction = {
 		scope:recipient = {
 			add_courtier = scope:secondary_recipient
 		}
+
+		# mamluk system
+		if = {
+			limit = {
+				is_mamluk_system_core_installed = yes
+			}
+			scope:secondary_recipient = {
+				add_trait = slave
+			}
+		}
 	}
 
 	on_decline = {

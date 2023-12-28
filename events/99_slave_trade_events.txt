@@ -1,8 +1,20 @@
 ﻿namespace = slave_trade
 
-
-# berber dicover longboats
+# berber meets longboats
 slave_trade.0001 = {
+	hidden = yes
+	scope = none
+	
+	immediate = {
+		set_global_variable = {
+			name = slave_trade_installed
+			value = yes
+		}
+	}
+}
+
+# berber meets longboats
+slave_trade.0002 = {
 	hidden = yes
 	scope = none
 
