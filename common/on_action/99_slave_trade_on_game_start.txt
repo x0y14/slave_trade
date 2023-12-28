@@ -1,0 +1,5 @@
+﻿on_game_start = {
+	events = {
+		slave_trade.0001
+	}
+}
