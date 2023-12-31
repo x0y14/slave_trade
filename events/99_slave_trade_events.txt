@@ -6,10 +6,10 @@ slave_trade.0001 = {
 	scope = none
 	
 	immediate = {
-		set_global_variable = {
-			name = slave_trade_installed
-			value = yes
-		}
+		# set_global_variable = {
+		# 	name = slave_trade_installed
+		# 	value = yes
+		# }
 	}
 }
 
@@ -25,5 +25,271 @@ slave_trade.0002 = {
 		culture:baranis = {
 			add_innovation = innovation_longboats
 		}
+	}
+}
+
+# sell_slave_interaction response: ACCEPT
+# ありがたく購入させていただくよ
+slave_trade.0101 = {
+	type = letter_event
+
+	opening = {
+		desc = slave_trade.0101.opening
+	}
+	desc = slave_trade.0101.desc
+		
+	sender = scope:recipient
+
+	immediate = {
+		if = {
+			limit = { scope:pt_sum_small = yes }
+			scope:recipient = {
+				pay_short_term_gold = {
+					target = scope:actor
+					gold = SLAVE_PRICE_SUM_SMALL
+				}
+			}
+		}
+		else_if = {
+			limit = { scope:pt_sum_medium = yes }
+			scope:recipient = {
+				pay_short_term_gold = {
+					target = scope:actor
+					gold = SLAVE_PRICE_SUM_MEDIUM
+				}
+			}
+		}
+		else_if = {
+			limit = { scope:pt_sum_large = yes }
+			scope:recipient = {
+				pay_short_term_gold = {
+					target = scope:actor
+					gold = SLAVE_PRICE_SUM_LARGE
+				}
+			}
+		}
+		else_if = {
+			limit = { scope:loyalty = yes }
+			scope:recipient = {
+				pay_short_term_gold = {
+					target = scope:actor
+					gold = SLAVE_PRICE_SUM_LOYALTY
+				}
+			}
+			scope:recipient = {
+				if = {
+					limit = {
+						can_add_hook = {
+							target = scope:secondary_recipient
+							type = loyalty_hook
+						}
+					}
+					add_hook = {
+						type = loyalty_hook
+						target = scope:secondary_recipient
+					}
+				}
+			}
+		}
+
+		# 才能の評価
+		# release_from_prison_interaction
+		if = {
+			limit = {
+				scope:recipient.culture = { has_cultural_parameter = can_recruit_prisoners_easily }
+			}
+			scope:secondary_recipient = {
+				add_opinion = {
+					modifier = loyal_servant
+					target = scope:recipient
+				}
+			}
+			scope:recipient = {
+				if = {
+					limit = {
+						can_add_hook = {
+							target = scope:secondary_recipient
+							type = loyalty_hook
+						}
+					}
+					add_hook = {
+						type = loyalty_hook
+						target = scope:secondary_recipient
+					}
+				}
+			}
+		}
+
+		scope:secondary_recipient = {
+			release_from_prison = yes
+		}
+		scope:recipient = {
+			add_courtier = scope:secondary_recipient
+		}
+
+		scope:secondary_recipient = {
+			if = {
+				limit = { NOT = { has_trait = slave } }
+				add_trait = slave
+			}
+		}
+	}
+
+	option = {
+		name = slave_trade.0101.a
+	}
+}
+
+# sell_slave_interaction response: REFUSE
+# この取引は受け入れられないよ
+slave_trade.0102 = {
+	type = letter_event
+
+	opening = {
+		desc = slave_trade.0102.opening
+	}
+	desc = slave_trade.0102.desc
+		
+	sender = scope:recipient
+
+	immediate = {
+		
+	}
+
+	option = {
+		name = slave_trade.0102.a
+	}
+}
+
+# purchase_slave_interaction response: ACCEPT
+# もちろん、お買い上げありがとう
+slave_trade.0103 = {
+	type = letter_event
+
+	opening = {
+		desc = slave_trade.0103.opening
+	}
+	desc = slave_trade.0103.desc
+		
+	sender = scope:recipient
+
+	immediate = {
+		if = {
+			limit = { scope:pt_sum_small = yes }
+			scope:actor = {
+				pay_short_term_gold = {
+					target = scope:recipient
+					gold = SLAVE_PRICE_SUM_SMALL
+				}
+			}
+		}
+		else_if = {
+			limit = { scope:pt_sum_medium = yes }
+			scope:actor = {
+				pay_short_term_gold = {
+					target = scope:recipient
+					gold = SLAVE_PRICE_SUM_MEDIUM
+				}
+			}
+		}
+		else_if = {
+			limit = { scope:pt_sum_large = yes }
+			scope:actor = {
+				pay_short_term_gold = {
+					target = scope:recipient
+					gold = SLAVE_PRICE_SUM_LARGE
+				}
+			}
+		}
+		else_if = {
+			limit = { scope:loyalty = yes }
+			scope:actor = {
+				pay_short_term_gold = {
+					target = scope:recipient
+					gold = SLAVE_PRICE_SUM_LOYALTY
+				}
+			}
+			scope:actor = {
+				if = {
+					limit = {
+						can_add_hook = {
+							target = scope:secondary_recipient
+							type = loyalty_hook
+						}
+					}
+					add_hook = {
+						type = loyalty_hook
+						target = scope:secondary_recipient
+					}
+				}
+			}
+		}
+
+		# 才能の評価
+		# release_from_prison_interaction
+		if = {
+			limit = {
+				scope:actor.culture = { has_cultural_parameter = can_recruit_prisoners_easily }
+			}
+			scope:secondary_recipient = {
+				add_opinion = {
+					modifier = loyal_servant
+					target = scope:actor
+				}
+			}
+			scope:actor = {
+				if = {
+					limit = {
+						can_add_hook = {
+							target = scope:secondary_recipient
+							type = loyalty_hook
+						}
+					}
+					add_hook = {
+						type = loyalty_hook
+						target = scope:secondary_recipient
+					}
+				}
+			}
+		}
+
+		scope:secondary_recipient = {
+			release_from_prison = yes
+		}
+		scope:actor = {
+			add_courtier = scope:secondary_recipient
+		}
+
+		scope:secondary_recipient = {
+			if = {
+				limit = { NOT = { has_trait = slave } }
+				add_trait = slave
+			}
+		}
+	}
+
+	option = {
+		name = slave_trade.0103.a
+	}
+}
+
+# purchase_slave_interaction response: REFUSE
+# この取引は受け入れられないよ
+slave_trade.0104 = {
+	type = letter_event
+
+	opening = {
+		desc = slave_trade.0104.opening
+	}
+	desc = slave_trade.0104.desc
+		
+	sender = scope:recipient
+
+	immediate = {
+		
+	}
+
+	option = {
+		name = slave_trade.0104.a
 	}
 }

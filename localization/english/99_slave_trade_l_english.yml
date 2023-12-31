@@ -1,11 +1,65 @@
-﻿l_english:  ### game concept
+﻿l_english:
+  ### Game concept
   game_concept_slave: "Slave"
-  game_concept_slave_desc: "$game_concept_slave$ DESC"
+  game_concept_slave_desc: "A $game_concept_slave$ is crippled character with limited inheritance of titles. Through purchase or $sell_slave_interaction$, [prisoner|e] become [slave|e]"
+
+
+  ### Trait
+  # 奴隷
+  trait_slave:0 "Slave"
+  trait_slave_desc:0 "This character was sold into slavery."
+  trait_slave_character_desc:0 "[ROOT.GetCharacter.GetFirstNameNoTooltip] was sold into slavery."
+
+  # 解放奴隷
+  trait_freed_slave:0 "Freed Slave"
+  trait_freed_slave_desc:0 "This character is a freed former slave."
+  trait_freed_slave_character_desc:0 "[ROOT.GetCharacter.GetFirstNameNoTooltip] is a freed former slave."
+
+
   ### interaction
-  sell_slave_interaction: "Arrange Slave Trade"
-  sell_slave_interaction_desc: "$sell_slave_interaction$ DECS"
-  ARRANGE_SLAVE_TRADE_SELECT_SLAVE_TO_TRADE: "Select [slave|e] to trade"
-  ARRANGE_SLAVE_TRADE_PROPOSAL: "Would you like to buy [secondary_actor.GetCulture.GetCollectiveNoun] slave [actor.Custom2('RelationToMeShort', SCOPE.sC('secondary_actor'))], [secondary_actor.GetFirstName] ?"
-  # SCHEME_HOOK:1 "Use a [hook_i][hook|e]"
+  sell_slave_interaction: "Sell Slave"
+  sell_slave_interaction_desc: "Propose to [recipient.GetShortUIName] the purchase of a [slave|e] you own."
+  SELL_SLAVE_SELECT_SLAVE_TO_TRADE: "Select [character|e] to sell"
+  SELL_SLAVE_PROPOSAL:0 "Would you like to buy [secondary_recipient.GetCulture.GetCollectiveNounNoTooltip] [slave|e], [secondary_recipient.GetShortUIName] ?"
   MAKE_LOYALTY:1 "make [slave|e] [hook_i] loyalty"
   recipient_secondary_sell_slave_interaction: "[slave|e]"
+  
+  enslave_interaction: "Enslave"
+  enslave_interaction_desc: "Decide to treat [recipient.GetShortUIName] as [slave|e]."
+  this_character_is_your_slave:0 "[recipient.GetShortUIName] is your [slave|e]"
+
+  purchase_slave_interaction: "Purchase Slave"
+  purchase_slave_interaction_desc: "Approached to purchase a [slave|e] owned by [recipient.GetShortUIName]"
+  PURCHASE_SLAVE_SELECT_SLAVE_TO_TRADE: "Select [slave|e] to purchase"
+  PURCHASE_SLAVE_PROPOSAL:0 "Would you allow me to purchase [secondary_recipient.GetShortUIName], who is staying at your [court|e], as a [slave|e]?"
+  recipient_secondary_purchase_slave_interaction: "[slave|e]"
+
+
+
+
+  ### Event
+  ## sell_slave_interaction response: ACCEPT
+  slave_trade.0101.opening:0 "[recipient.Custom2('AppropriateGreetingPositive', actor )]"
+  slave_trade.0101.desc:0 "Thanks for the great suggestions. I will gratefully purchase [secondary_recipient.GetShortUIName]."
+  slave_trade.0101.a:0 "Excellent"
+  # sell_slave_interaction response: REFUSE
+  slave_trade.0102.opening:0 "[recipient.Custom2('AppropriateGreetingPositive', actor )]"
+  slave_trade.0102.desc:0 "Thanks for the great suggestions. However, this deal is unacceptable. Please don't feel bad."
+  slave_trade.0102.a:0 "A shame..."
+  # purchase_slave_interaction response: ACCEPT
+  slave_trade.0103.opening:0 "[recipient.Custom2('AppropriateGreetingPositive', actor )]"
+  slave_trade.0103.desc:0 "Thanks for the great suggestions. I hope this deal brings you good results."
+  slave_trade.0103.a:0 "Excellent"
+  # purchase_slave_interaction response: REFUSE
+  slave_trade.0104.opening:0 "[recipient.Custom2('AppropriateGreetingPositive', actor )]"
+  slave_trade.0104.desc:0 "Thanks for the great suggestions. However, this deal is unacceptable. Please don't feel bad."
+  slave_trade.0104.a:0 "A shame..."
+
+
+  ### Buildings
+  building_type_slave_market_01:0 "Slave Market"
+  building_type_slave_market_01_desc:0 "Few places allow people to relax and socialize as well as a beautiful garden. While a small and personal garden would suffice for most, only the most spectacular of creations is good enough for the wealthy and powerful!"
+  slave_market_effect_desc: "slave_market_effect_desc"
+
+  building_slave_market_01:0 "Slave Market 01"
+  building_slave_market_01_desc:0 "A small garden enclosed by stone walls. It provides a small haven of peace and comfort by shutting out the busy world outside."

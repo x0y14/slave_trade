@@ -5,26 +5,57 @@ sell_slave_interaction = {
 	category = interaction_category_diplomacy
 	common_interaction = yes
 
+	desc = sell_slave_interaction_desc
+
 	populate_recipient_list = {
 		scope:actor = {
 			every_prisoner = {
-				limit = { NOT = { is_in_prison_type = dungeon } }
+				limit = {
+					NOT = { is_in_prison_type = dungeon }
+					NOT = { is_close_or_extended_family_of = scope:actor }
+				}
 				# ムスリムはムスリムを奴隷とすることが禁じられている
 				# TODO: scope:actorがイスラム教だったらムスリムは除外する
 				# あるいは販売できるが犯罪になる(投獄理由)
 				add_to_list = characters
 			}
 		}
+		scope:actor = {
+			every_courtier = {
+				limit = {
+					has_trait = slave
+					NOT = { is_close_or_extended_family_of = scope:actor }
+				}
+				add_to_list = characters
+			}
+		}
 	}
 
-	desc = sell_slave_interaction_desc
+	prompt = SELL_SLAVE_SELECT_SLAVE_TO_TRADE
 
-	prompt = ARRANGE_SLAVE_TRADE_SELECT_SLAVE_TO_TRADE
-
-	notification_text = ARRANGE_SLAVE_TRADE_PROPOSAL
+	notification_text = SELL_SLAVE_PROPOSAL
 
 	is_shown = {
 		NOT = { scope:recipient = scope:actor }
+		scope:actor = {
+			OR = {
+				# 自分で奴隷市場を持っているか
+				any_held_county = {
+					any_county_province = {
+						has_building_or_higher = slave_market_01
+					}
+				}
+				# いずれかの封臣が奴隷市場を持っている
+				any_vassal = {
+					any_held_county = {
+						any_county_province = {
+							has_building_or_higher = slave_market_01
+						}
+					}
+				}
+			}
+		}
+		scope:recipient = { is_landed = yes }
 	}
 
 	is_valid_showing_failures_only = {
@@ -35,7 +66,9 @@ sell_slave_interaction = {
 		}
 	}
 
-	can_be_picked = {
+	can_send = {
+		exists = scope:target
+
 		NOT = { is_landed = yes }
 		# any_heir_title = {
 		# 	exists = holder
@@ -45,6 +78,17 @@ sell_slave_interaction = {
 		# 		value > 2
 		# 	}
 		# }
+		NOT = {
+			scope:secondary_recipient = {
+				is_close_or_extended_family_of = scope:recipient
+			}
+		}
+		NOT = {
+			scope:secondary_recipient = {
+				is_close_or_extended_family_of = scope:actor
+			}
+		}
+
 	}
 
 	cost = {}
@@ -54,110 +98,15 @@ sell_slave_interaction = {
 	}
 
 	on_accept = {
-		# add_courtier
-		# SLAVE_PRICE_SUM_SMALL = 10
-		# SLAVE_PRICE_SUM_MEDIUM = 50
-		# SLAVE_PRICE_SUM_LARGE = 100
-		# SLAVE_PRICE_SUM_LOYALTY = 150
-		if = {
-			limit = { scope:pt_sum_small = yes }
-			scope:recipient = {
-				pay_short_term_gold = {
-					target = scope:actor
-					gold = SLAVE_PRICE_SUM_SMALL
-				}
-			}
-		}
-		else_if = {
-			limit = { scope:pt_sum_medium = yes }
-			scope:recipient = {
-				pay_short_term_gold = {
-					target = scope:actor
-					gold = SLAVE_PRICE_SUM_MEDIUM
-				}
-			}
-		}
-		else_if = {
-			limit = { scope:pt_sum_large = yes }
-			scope:recipient = {
-				pay_short_term_gold = {
-					target = scope:actor
-					gold = SLAVE_PRICE_SUM_LARGE
-				}
-			}
-		}
-		else_if = {
-			limit = { scope:loyalty = yes }
-			scope:recipient = {
-				pay_short_term_gold = {
-					target = scope:actor
-					gold = SLAVE_PRICE_SUM_LOYALTY
-				}
-			}
-			scope:recipient = {
-				if = {
-					limit = {
-						can_add_hook = {
-							target = scope:secondary_recipient
-							type = loyalty_hook
-						}
-					}
-					add_hook = {
-						type = loyalty_hook
-						target = scope:secondary_recipient
-					}
-				}
-			}
-		}
-
-		# 才能の評価
-		# release_from_prison_interaction
-		if = {
-			limit = {
-				scope:recipient.culture = { has_cultural_parameter = can_recruit_prisoners_easily }
-			}
-			scope:secondary_recipient = {
-				add_opinion = {
-					modifier = loyal_servant
-					target = scope:recipient
-				}
-			}
-			scope:recipient = {
-				if = {
-					limit = {
-						can_add_hook = {
-							target = scope:secondary_recipient
-							type = loyalty_hook
-						}
-					}
-					add_hook = {
-						type = loyalty_hook
-						target = scope:secondary_recipient
-					}
-				}
-			}
-		}
-
-		scope:secondary_recipient = {
-			release_from_prison = yes
-		}
-		scope:recipient = {
-			add_courtier = scope:secondary_recipient
-		}
-
-		# mamluk system
-		if = {
-			limit = {
-				is_mamluk_system_core_installed = yes
-			}
-			scope:secondary_recipient = {
-				add_trait = slave
-			}
+		scope:actor = {
+			trigger_event = slave_trade.0101
 		}
 	}
 
 	on_decline = {
-
+		scope:actor = {
+			trigger_event = slave_trade.0102
+		}
 	}
 
 
@@ -211,6 +160,214 @@ sell_slave_interaction = {
 					target = scope:secondary_recipient
 					type = loyalty_hook
 				}
+			}
+		}
+		flag = loyalty
+		localization = MAKE_LOYALTY
+	}
+	should_use_extra_icon = {}
+	extra_icon = "gfx/interface/icons/character_interactions/hook_icon.dds"
+
+
+	ai_accept = {
+		base = 100
+	}
+}
+
+enslave_interaction = {
+	icon = prison
+	category = interaction_category_diplomacy
+	common_interaction = yes
+
+	desc = enslave_interaction_desc
+
+	is_shown = {
+		NOT = { scope:recipient = scope:actor }
+		scope:recipient = {
+			is_imprisoned = yes
+		}
+	}
+
+	is_valid_showing_failures_only = {
+		scope:recipient = {
+			is_imprisoned_by = scope:actor
+		}
+		# custom_tooltip = {
+		# 	text = this_character_is_your_slave
+		# 	scope:recipient = {
+		# 		NAND = {
+		# 			is_courtier_of = scope:actor
+		# 			has_trait = slave
+		# 		}
+		# 	}
+		# }
+		scope:recipient = {
+			NOT = { has_trait = slave }
+			NOT = { is_landed = yes }
+			NOT = { is_vassal_of = scope:actor }
+			NOT = { is_close_or_extended_family_of = scope:actor }
+			NOT = { is_spouse_of = scope:actor }
+		}
+	}
+
+	ignores_pending_interaction_block = yes
+	auto_accept = yes
+	on_accept = {
+		scope:recipient = { add_trait = slave }
+	}
+}
+
+purchase_slave_interaction = {
+	icon = prison
+	category = interaction_category_diplomacy
+	common_interaction = yes
+
+	desc = purchase_slave_interaction_desc
+
+	populate_recipient_list = {
+		scope:recipient = {
+			every_prisoner = {
+				limit = { NOT = { is_in_prison_type = dungeon } }
+				add_to_list = characters
+			}
+		}
+		scope:recipient = {
+			every_courtier = {
+				limit = { has_trait = slave }
+				add_to_list = characters
+			}
+		}
+	}
+
+	prompt = PURCHASE_SLAVE_SELECT_SLAVE_TO_TRADE
+
+	notification_text = PURCHASE_SLAVE_PROPOSAL
+
+	is_shown = {
+		NOT = { scope:recipient = scope:actor }
+		scope:recipient = {
+			OR = {
+				# 相手は奴隷市場を持っている
+				any_held_county = {
+					any_county_province = {
+						has_building_or_higher = slave_market_01
+					}
+				}
+				# いずれかの封臣が奴隷市場を持っている
+				any_vassal = {
+					any_held_county = {
+						any_county_province = {
+							has_building_or_higher = slave_market_01
+						}
+					}
+				}
+			}
+			is_landed = yes
+		}
+	}
+
+	is_valid_showing_failures_only = {
+		scope:recipient = {
+			OR = {
+				any_courtier = {
+					has_trait = slave
+					count > 0
+				}
+				any_prisoner = {
+					count > 0
+				}
+			}
+		}
+	}
+
+	can_send = {
+		exists = scope:target
+
+		NOT = { is_landed = yes }
+		NOT = { is_councillor_of = scope:actor }
+		NOT = { has_any_court_position = yes }
+
+		NOT = {
+			scope:secondary_recipient = {
+				is_close_or_extended_family_of = scope:recipient
+			}
+		}
+		NOT = {
+			scope:secondary_recipient = {
+				is_close_or_extended_family_of = scope:actor
+			}
+		}
+	}
+
+	cost = {}
+
+	on_send = {
+		# 私を売りに出した
+	}
+
+	on_accept = {
+		scope:actor = {
+			trigger_event = slave_trade.0103
+		}
+	}
+
+	on_decline = {
+		scope:actor = {
+			trigger_event = slave_trade.0104
+		}
+	}
+
+	send_options_exclusive = yes
+	# 安い値段 在庫処分的な
+	send_option = {
+		is_shown = { always = yes }
+		flag = pt_sum_small
+		localization = "PT_SUM_SMALL"
+	}
+	# 普通の値段 子供とか
+	send_option = {
+		# purchase_truce_interaction
+		is_valid = {
+			# We use the most expensive of scope:actor or scope:recipient's income, so we check both.
+			scope:actor = {
+				can_make_expensive_purchase_trigger = { PRICE = SLAVE_PRICE_SUM_MEDIUM }
+			}
+		}
+		is_shown = { always = yes }
+		flag = pt_sum_medium
+		starts_enabled = { always = yes }
+		localization = "PT_SUM_MEDIUM"
+	}
+	# 高い値段 良い遺伝子を持っている人
+	send_option = {
+		is_valid = {
+			# We use the most expensive of scope:actor or scope:recipient's income, so we check both.
+			scope:actor = {
+				can_make_expensive_purchase_trigger = { PRICE = SLAVE_PRICE_SUM_LARGE }
+			}
+		}
+		is_shown = { always = yes }
+		flag = pt_sum_large
+		localization = "PT_SUM_LARGE"
+	}
+	# 忠誠を誓わせる 兵士向け
+	send_option = {
+		# is_shown = {
+		# 	exists = scope:secondary_recipient
+		# }
+		is_valid = {
+			exists = scope:secondary_recipient
+			NOT = {
+				scope:actor.culture = { has_cultural_parameter = can_recruit_prisoners_easily }
+			}
+			scope:actor = {
+				can_add_hook = {
+					target = scope:secondary_recipient
+					type = loyalty_hook
+				}
+			}
+			scope:actor = {
+				can_make_expensive_purchase_trigger = { PRICE = SLAVE_PRICE_SUM_LOYALTY }
 			}
 		}
 		flag = loyalty
